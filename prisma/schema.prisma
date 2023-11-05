@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Модель пользователя
+
+model User {
+  id           String   @id @default(uuid())
+  firstName    String   @map("first_name")
+  middleName   String   @map("middle_name")
+  lastName     String   @map("last_name")
+  email        String   @unique
+  password     String
+  activateCode Int      @map("activate_code")
+  isPremium    Boolean  @default(false) @map("is_premium")
+  balance      Int      @default(0)
+  role         Roles    @default(USER)
+  eventBlock   Boolean  @default(false) @map("event_block")
+  isFeedback   Boolean  @default(false) @map("is_feedback")
+  eventsMember Event[]  @relation(name: "event_member")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+// Модель-перечисление возможных ролей пользователей
+
+enum Roles {
+  USER
+  EVENT_MANAGER
+  SUPPORT
+  MODERATOR
+  ADMIN
+  SUPERADMIN
+
+  @@map("roles")
+}
+
+// Модель мероприятия
+
+model Event {
+  id                  String  @id @default(uuid())
+  eventName           String  @map("event_name")
+  eventBanner         String  @map("event_banner")
+  eventImage          String  @map("event_image")
+  eventImageThumbnail String  @map("event_image_thumbnail")
+  eventLocation       String  @map("event_location")
+  eventPlace          String  @map("event_place")
+  isFree              Boolean @default(true) @map("is_free")
+  enterPrice          Int     @default(0) @map("event_price")
+  owner               User    @relation(fields: [ownerId], references: [id])
+  ownerId             String  @map("owner_id")
+  eventDescription    String  @map("event_description")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("events")
+}
