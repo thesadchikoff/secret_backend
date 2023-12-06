@@ -5,12 +5,9 @@ import {CreateUserDto} from "./dto/create-user.dto";
 
 @Injectable()
 export class UsersService {
-  private readonly logger = new Logger("Tes1")
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    const data = await this.logger.log("Test message")
-
     return this.prisma.user.findMany()
   }
 
@@ -40,7 +37,13 @@ export class UsersService {
 
   async create(dto: CreateUserDto): Promise<User> {
     const newUser = await this.prisma.user.create({
-      data: dto
+      data: {
+        firstName: dto.firstName,
+        middleName: dto.middleName,
+        lastName: dto.lastName,
+        email: dto.email,
+        password: dto.password
+      }
     })
     if (!newUser) {
       throw new HttpException("Error Creation User", HttpStatus.BAD_REQUEST)
